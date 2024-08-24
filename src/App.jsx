@@ -20,6 +20,14 @@ function App() {
         setCvListId(cvListId + 1);
     }
 
+    function deleteCv(key){
+        setCvList((prevCvList) => {
+            return prevCvList.filter((element) => {
+                return element.Key !== key;
+            })
+        });
+    }
+
     return (
         <>
             <form className="cvForm">
@@ -28,20 +36,22 @@ function App() {
                 <PracticalExperience />
                 <input type="submit" value="Submit" className="cvFormSubmit" onClick={submitButton} />
             </form>
-            <div className="cvCardHolderDiv">{cvList.length > 0 && <NewCv cvList={cvList} />}</div>
+            <div className="cvCardHolderDiv">{cvList.length > 0 && <NewCv cvList={cvList} deleteCv={deleteCv}/>}</div>
         </>
     );
 }
 
 export default App;
 
-function NewCv({ cvList }) {
+function NewCv({ cvList, deleteCv }) {
     return (
         <>
             {cvList.map((element) => {
                 return (
                     <div className="cvDiv" key={element.Key}>
-                        <CvContent list={element} identifier={element.Key}/>
+                        <CvContent list={element} />
+                        <p>{element.Key}</p>
+                        <button onClick={() => deleteCv(element.Key)}>Delete</button>
                     </div>
                 );
             })}
@@ -49,50 +59,70 @@ function NewCv({ cvList }) {
     );
 }
 
-function CvContent({ list, identifier }) {
+function CvContent({ list }) {
     const [listContent, setListContent] = useState(list.content);
     const [editState, setEditState] = useState(false);
+    const listKeys = Object.keys(listContent);
 
     function editObject() {
         setEditState(true);
     }
-
     function submitEdit() {
         setEditState(false);
     }
-
     function changeContent(event) {
-        setListContent(currentContent => ({
-            ...currentContent, 
-            Name: event.target.value
-        }))
+        const contentName = event.target.getAttribute("class");
+        setListContent((currentContent) => ({
+            ...currentContent,
+            [contentName]: event.target.value,
+        }));
+    }
+    function inputType(elementType) {
+        switch(elementType) {
+            case "Name" :
+                return "text"
+            case "Email" : 
+                return "email"
+            case "Phone Number" :
+                return "number"
+        }
     }
 
     return (
         <>
-            {!editState ? (
-                <div>
-                    <p>{listContent.Name}</p>
-                    <p>{identifier}</p>
+            { listKeys.map((element) => 
+                ( !editState ? (
+                <div key={element}>
+                    <p>{listContent[element]}</p>
                     <button onClick={editObject}>Edit</button>
                 </div>
-            ) : (
-                <div>
-                    <input type="text" value={listContent.Name} onChange={changeContent}/>
+                ) : (
+                <div key={element}>
+                    <input type={inputType(element)} value={listContent[element]} onChange={changeContent} className={element}/>
                     <button onClick={submitEdit}>Submit edit</button>
                 </div>
-            )}
-            {!editState ? (
-                <div>
-                    <p>{listContent.Email}</p>
-                    <button onClick={editObject}>Edit</button>
-                </div>
-            ) : (
-                <div>
-                    <input type="text" value={listContent.Email} onChange={changeContent}/>
-                    <button onClick={submitEdit}>Submit edit</button>
-                </div>
+                ))
             )}
         </>
-    );
+    )
+
+    // return (
+    //     <>
+    //         {!editState ? (
+    //             <div>
+    //                 <p>{listContent.Name}</p>
+    //                 <button onClick={editObject}>Edit</button>
+    //                 <p>{listContent.Email}</p>
+    //                 <button onClick={editObject}>Edit</button>
+    //             </div>
+    //         ) : (
+    //             <div>
+    //                 <input type="text" value={listContent.Name} onChange={changeContent} className="Name" />
+    //                 <button onClick={submitEdit}>Submit edit</button>
+    //                 <input type="email" value={listContent.Email} onChange={changeContent} className="Email" />
+    //                 <button onClick={submitEdit}>Submit edit</button>
+    //             </div>
+    //         )}
+    //     </>
+    // );
 }
