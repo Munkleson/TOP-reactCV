@@ -32,9 +32,13 @@ function App() {
     return (
         <>
             <form className="cvForm">
+                <p>General information</p>
                 <GeneralInfo />
+                <p>Educational experience</p>
                 <EducationalExperience />
                 <PracticalExperience />
+                <br />
+                <br /> 
                 <input type="submit" value="Submit" className="cvFormSubmit" onClick={submitButton} />
             </form>
             <div className="cvCardHolderDiv">{cvList.length > 0 && <NewCv cvList={cvList} deleteCv={deleteCv}/>}</div>
@@ -74,7 +78,6 @@ function CvContent({ list }) {
         console.log(element)
         // setEditState(false);
         setEditingArray((currentContent) => currentContent.filter((keep) => {
-            console.log(keep)
             return keep !== element;
         }))
     }
@@ -87,15 +90,18 @@ function CvContent({ list }) {
     }
     function inputType(elementType) {
         switch(elementType) {
-            case "Name" :
-                return "text"
             case "Email" : 
-                return "email"
+                return "email";
             case "Phone Number" :
-                return "number"
+                return "number";
+            case "Start year of study" :
+                return "date";
+            case "End year of study" :
+                return "date";
+            default:
+                return "text";
         }
     }
-    console.log(editingArray)
     return (
         <>
             { listKeys.map((element) => 
@@ -108,15 +114,16 @@ function CvContent({ list }) {
                         <button onClick={() => editObject(element)} className={element}>Edit</button>
                     </div>
                     ) : (
-                    <div key={element}>
+                        <form key={element}>
                         <h2>{element}</h2>
                         <input type={inputType(element)} value={listContent[element]} onChange={changeContent} className={element}/>
-                        <button onClick={() => submitEdit(element)} className={element}>Submit edit</button>
-                    </div>
-                ))
+                        <input type="submit" onClick={() => submitEdit(element)} className={element} value="Submit edit"/>
+                        </form>
+                    )
+                )
             )}
         </>
-    )
+        )
 
     // return (
     //     <>
